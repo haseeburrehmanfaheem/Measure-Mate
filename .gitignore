@@ -1,0 +1,128 @@
+*.iml
+.gradle
+/local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+# Gradle
+.gradle/
+build/
+local.properties
+*.iml
+.gradle/
+**/build/
+!gradle/wrapper/gradle-wrapper.jar
+.gradle/
+gradle-app.setting
+gradle.properties
+
+# Java & Kotlin
+*.class
+*.jar
+*.war
+*.ear
+*.apk
+*.dex
+*.log
+
+# Android/IntelliJ IDEA specific
+.idea
+.cache/
+.idea/workspace.xml
+.idea/libraries
+.idea/tasks.xml
+.idea/caches
+.idea/modules.xml
+.idea/dictionaries
+.idea/codestyles
+.idea/vcs.xml
+*.iws
+*.iml
+*.ipr
+out/
+misc.xml
+
+# Keystore files
+*.jks
+*.keystore
+*.properties
+
+# Android Studio
+.cxx/
+.externalNativeBuild/
+.cxx/
+*.hprof
+local.properties
+*.log
+*.lock
+
+# Generated Files
+captures/
+output.json
+crashlytics.properties
+fabric.properties
+*.symbols
+
+# Translations
+*.mo
+*.po
+
+# Android Specific
+*.apk
+*.ap_
+*.dex
+.cache/
+.expo/
+.expo-shared/
+.expo-foo/
+expo-app.node_modules/
+.gradle/
+build/
+bin/
+
+# Generated model files
+app/src/main/java/**/R.java
+app/src/main/java/**/BuildConfig.java
+app/src/main/java/**/Manifest.java
+app/src/main/res/**/R.xml
+
+# Logs and databases
+*.log
+*.sql
+
+# Dependency directories
+/.gradle
+/.idea/caches/
+/.idea/libraries/
+/.idea/modules.xml
+
+# Ignore Mac system files
+.DS_Store
+
+# Windows thumbnail cache
+Thumbs.db
+
+# NDK
+obj/
+
+# Gradle Wrapper
+.gradle
+gradle/
+wrapper/
+.gradle/
+gradlew
+gradlew.bat
+gradle-wrapper.jar
+gradle-wrapper.properties
+
+# End of File
+
