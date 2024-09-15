@@ -1,6 +1,6 @@
 *.iml
-.gradle
-/local.properties
+.gradle/
+local.properties
 /.idea/caches
 /.idea/libraries
 /.idea/modules.xml
@@ -10,20 +10,13 @@
 .DS_Store
 /build
 /captures
-.externalNativeBuild
-.cxx
-local.properties
-# Gradle
-.gradle/
-build/
-local.properties
-*.iml
-.gradle/
-**/build/
+.externalNativeBuild/
+.cxx/
+
+# Gradle-specific files to keep
 !gradle/wrapper/gradle-wrapper.jar
-.gradle/
-gradle-app.setting
-gradle.properties
+!gradle/wrapper/gradle-wrapper.properties
+!gradle/libs.versions.toml
 
 # Java & Kotlin
 *.class
@@ -35,16 +28,8 @@ gradle.properties
 *.log
 
 # Android/IntelliJ IDEA specific
-.idea
+.idea/
 .cache/
-.idea/workspace.xml
-.idea/libraries
-.idea/tasks.xml
-.idea/caches
-.idea/modules.xml
-.idea/dictionaries
-.idea/codestyles
-.idea/vcs.xml
 *.iws
 *.iml
 *.ipr
@@ -59,7 +44,6 @@ misc.xml
 # Android Studio
 .cxx/
 .externalNativeBuild/
-.cxx/
 *.hprof
 local.properties
 *.log
@@ -81,19 +65,7 @@ fabric.properties
 *.ap_
 *.dex
 .cache/
-.expo/
-.expo-shared/
-.expo-foo/
-expo-app.node_modules/
-.gradle/
-build/
-bin/
-
-# Generated model files
-app/src/main/java/**/R.java
-app/src/main/java/**/BuildConfig.java
-app/src/main/java/**/Manifest.java
-app/src/main/res/**/R.xml
+.ndk/
 
 # Logs and databases
 *.log
@@ -111,18 +83,9 @@ app/src/main/res/**/R.xml
 # Windows thumbnail cache
 Thumbs.db
 
-# NDK
-obj/
-
 # Gradle Wrapper
-.gradle
-gradle/
-wrapper/
-.gradle/
+!gradle-wrapper.properties
+!gradle/wrapper/gradle-wrapper.jar
+!gradle/libs.versions.toml
 gradlew
 gradlew.bat
-gradle-wrapper.jar
-gradle-wrapper.properties
-
-# End of File
-
