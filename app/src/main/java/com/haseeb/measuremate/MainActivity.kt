@@ -13,6 +13,7 @@ import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.haseeb.measuremate.ui.add_item.AddItemScreen
 import com.haseeb.measuremate.ui.dashboard.DashboardScreen
 import com.haseeb.measuremate.ui.signin.SignInScreen
 import com.haseeb.measuremate.ui.theme.MeasureMateTheme
@@ -25,7 +26,8 @@ class MainActivity : ComponentActivity() {
         setContent {
             MeasureMateTheme {
                 val windowSizeClass = calculateWindowSizeClass(this)
-                SignInScreen(windowSize = windowSizeClass.widthSizeClass )
+//                SignInScreen(windowSize = windowSizeClass.widthSizeClass )
+                AddItemScreen()
 //                DashboardScreen()
             }
 
