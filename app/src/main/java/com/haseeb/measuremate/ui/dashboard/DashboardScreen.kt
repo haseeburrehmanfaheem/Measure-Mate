@@ -32,6 +32,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import com.haseeb.measuremate.domain.model.BodyPart
 import com.haseeb.measuremate.domain.model.User
 import com.haseeb.measuremate.domain.model.predefinedBodyParts
+import com.haseeb.measuremate.ui.component.Dialog
 import com.haseeb.measuremate.ui.component.ProfileBottomSheet
 import com.haseeb.measuremate.ui.component.ProfilePicPlaceholder
 import com.haseeb.measuremate.ui.theme.MeasureMateTheme
@@ -49,6 +51,7 @@ import com.haseeb.measuremate.ui.theme.MeasureMateTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DashboardScreen(){
+    var isSignOutDialogOpen by rememberSaveable { mutableStateOf(false) }
 
     var isProfileBottomSheetOpen by remember {
         mutableStateOf(false)
@@ -67,7 +70,23 @@ fun DashboardScreen(){
         },
         buttonLoadingState = false,
         buttonPrimaryText = "Sign out with Google",
-        onGoogleButtonClick = {}
+        onGoogleButtonClick = {
+            isSignOutDialogOpen = true
+        }
+    )
+
+    Dialog(
+        onDismissRequest = {
+            isSignOutDialogOpen = false
+        },
+        onConfirm = {
+            isSignOutDialogOpen = false
+        },
+        title = "Sign Out",
+        body = {
+            Text("Are you sure you want to sign out?")
+        },
+        isOpen = isSignOutDialogOpen
     )
 
     Box(
