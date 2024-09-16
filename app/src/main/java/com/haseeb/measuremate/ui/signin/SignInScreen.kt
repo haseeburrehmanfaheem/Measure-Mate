@@ -13,6 +13,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -22,6 +27,7 @@ import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import com.haseeb.measuremate.R
 import com.haseeb.measuremate.ui.component.AnonymousSignInButton
+import com.haseeb.measuremate.ui.component.Dialog
 import com.haseeb.measuremate.ui.component.GoogleSignInButton
 import com.haseeb.measuremate.ui.theme.MeasureMateTheme
 
@@ -30,6 +36,21 @@ import com.haseeb.measuremate.ui.theme.MeasureMateTheme
 fun SignInScreen(
     windowSize : WindowWidthSizeClass
 ){
+
+    var isSignInAnonymousDialogOpen by rememberSaveable { mutableStateOf(false) }
+    Dialog(
+        onDismissRequest = {
+            isSignInAnonymousDialogOpen = false
+        },
+        onConfirm = {
+            isSignInAnonymousDialogOpen = false
+        },
+        title = "Login anonymously?",
+        body = {
+            Text("You can use the app without signing in. However, your data will not be saved. \n Are you sure you want to proceed?")
+        },
+        isOpen = isSignInAnonymousDialogOpen
+    )
 
     when(windowSize){
         WindowWidthSizeClass.Compact -> {
@@ -52,11 +73,15 @@ fun SignInScreen(
                 Spacer(modifier = Modifier.fillMaxHeight( 0.4f))
 
                 GoogleSignInButton(
-                    onClick = {}
+                    onClick = {
+
+                    }
                 )
                 Spacer(modifier = Modifier.height(20.dp))
                 AnonymousSignInButton(
-                    onClick = {}
+                    onClick = {
+                        isSignInAnonymousDialogOpen = true
+                    }
                 )
 
             }
@@ -66,7 +91,9 @@ fun SignInScreen(
                 modifier = Modifier.fillMaxSize(),
             ) {
                 Column(
-                    modifier = Modifier.fillMaxHeight().weight(1f),
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .weight(1f),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ){
@@ -83,17 +110,23 @@ fun SignInScreen(
                     )
                 }
                 Column(
-                    modifier = Modifier.fillMaxHeight().weight(1f),
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .weight(1f),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ){
 
                     GoogleSignInButton(
-                        onClick = {}
+                        onClick = {
+
+                        }
                     )
                     Spacer(modifier = Modifier.height(20.dp))
                     AnonymousSignInButton(
-                        onClick = {}
+                        onClick = {
+                            isSignInAnonymousDialogOpen = true
+                        }
                     )
                 }
             }
@@ -104,11 +137,11 @@ fun SignInScreen(
 
 
 
-//@Preview(showSystemUi = true, showBackground = true)
-@PreviewScreenSizes
+@Preview(showSystemUi = true, showBackground = true)
+//@PreviewScreenSizes
 @Composable
 private fun SignInScreenPreview(){
     MeasureMateTheme {
-        SignInScreen(windowSize = WindowWidthSizeClass.Medium)
+        SignInScreen(windowSize = WindowWidthSizeClass.Compact)
     }
 }
