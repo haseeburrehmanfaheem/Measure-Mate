@@ -1,6 +1,7 @@
 package com.haseeb.measuremate.ui.details
 
 import android.icu.util.Measure
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.InteractionSource
@@ -52,10 +53,19 @@ import com.haseeb.measuremate.ui.component.MeasuringUnitBottomSheet
 import kotlinx.coroutines.launch
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.runtime.remember
+import androidx.compose.ui.text.style.TextDecoration
 import com.haseeb.measuremate.domain.model.BodyPartValue
 import com.haseeb.measuremate.ui.component.LineGraph
+import com.haseeb.measuremate.ui.util.changeLocalDateToDateString
+import com.haseeb.measuremate.ui.util.roundToDecimal
 import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -128,8 +138,17 @@ fun DetailsScreen() {
                 .padding(16.dp),
             bodyPartValues = dummyBodyPartValues)
 
+        Box(
+            modifier = Modifier.fillMaxSize(),
+        ){
+            HistorySection(bodyPartValues = dummyBodyPartValues, measuringUnitCode = MeasuringUnit.CM.code) {}
+        }
+
     }
-    
+
+
+
+
 }
 
 
@@ -242,6 +261,79 @@ private fun DetailsTopBar(
     )
 }
 
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun HistorySection(
+    modifier: Modifier = Modifier,
+    bodyPartValues: List<BodyPartValue>,
+    measuringUnitCode: String?,
+    onDeleteIconClick: (BodyPartValue) -> Unit
+) {
+    LazyColumn(
+        modifier = modifier,
+        contentPadding = PaddingValues(16.dp)
+    ) {
+        val grouped = bodyPartValues.groupBy { it.date.month }
+        item {
+            Text(text = "History", textDecoration = TextDecoration.Underline)
+            Spacer(modifier = Modifier.height(20.dp))
+        }
+        grouped.forEach { (month, bodyPartValues) ->
+            stickyHeader {
+                Text(
+                    text = month.name,
+                    style = MaterialTheme.typography.bodySmall
+                )
+                Spacer(modifier = Modifier.height(5.dp))
+            }
+            items(bodyPartValues) { bodyPartValue ->
+                HistoryCard(
+                    modifier = Modifier.padding(bottom = 8.dp),
+                    bodyPartValue = bodyPartValue,
+                    measuringUnitCode = measuringUnitCode,
+                    onDeleteIconClick = { onDeleteIconClick(bodyPartValue) }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun HistoryCard(
+    modifier: Modifier = Modifier,
+    bodyPartValue: BodyPartValue,
+    measuringUnitCode: String?,
+    onDeleteIconClick: () -> Unit
+) {
+    ElevatedCard(modifier = modifier) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                modifier = Modifier.padding(horizontal = 5.dp),
+                imageVector = Icons.Default.DateRange,
+                contentDescription = null
+            )
+            Text(
+                text = bodyPartValue.date.changeLocalDateToDateString(),
+                style = MaterialTheme.typography.bodyLarge
+            )
+            Spacer(modifier = Modifier.weight(1f))
+            Text(
+                text = "${bodyPartValue.value.roundToDecimal(4)} ${measuringUnitCode ?: ""}",
+                style = MaterialTheme.typography.bodyLarge
+            )
+            IconButton(onClick = { onDeleteIconClick() }) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = "Delete"
+                )
+            }
+        }
+    }
+}
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
