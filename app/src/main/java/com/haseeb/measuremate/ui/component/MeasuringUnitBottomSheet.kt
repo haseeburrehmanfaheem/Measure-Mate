@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -56,9 +58,8 @@ fun MeasuringUnitBottomSheet(
                 }
             }
         ) {
-
-                Spacer(modifier =modifier.height(12.dp))
-                MeasuringUnit.entries.forEach { unit ->
+            LazyColumn {
+                items(MeasuringUnit.entries){unit ->
                     Box(modifier = Modifier
                         .fillMaxWidth()
                         .clickable { onitemClicked(unit) }
@@ -66,11 +67,9 @@ fun MeasuringUnitBottomSheet(
                     ){
                         Text(text = "${unit.label} (${unit.code})", style = MaterialTheme.typography.bodyMedium)
                     }
+
                 }
-            Spacer(modifier =modifier.height(12.dp))
-
-
-
+            }
         }
     }
 

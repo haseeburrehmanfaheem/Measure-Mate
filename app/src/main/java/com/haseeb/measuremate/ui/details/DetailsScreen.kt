@@ -55,27 +55,49 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material3.DatePickerState
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.style.TextDecoration
 import com.haseeb.measuremate.domain.model.BodyPartValue
+import com.haseeb.measuremate.ui.component.DatePicker
 import com.haseeb.measuremate.ui.component.LineGraph
 import com.haseeb.measuremate.ui.component.NewValueInputBar
+import com.haseeb.measuremate.ui.util.PastOrPresentSelectableDates
 import com.haseeb.measuremate.ui.util.changeLocalDateToDateString
+import com.haseeb.measuremate.ui.util.changeMillisToLocalDate
 import com.haseeb.measuremate.ui.util.roundToDecimal
 import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DetailsScreen() {
+fun DetailsScreen(
+    windowSizeClass : WindowWidthSizeClass
+) {
+
+
     var selectedTimeRange by rememberSaveable { mutableStateOf(TimeRange.LAST7DAYS) }
+    var isDatePickerOpen by rememberSaveable { mutableStateOf(false) }
+    val datePickerState = rememberDatePickerState(
+        initialSelectedDateMillis = System.currentTimeMillis(),
+        selectableDates = PastOrPresentSelectableDates
+    )
+    DatePicker(
+        state = datePickerState,
+        isOpen = isDatePickerOpen,
+        onDismissRequest = {isDatePickerOpen = false},
+        onConfirmButtonClicked = {isDatePickerOpen = false}
+    )
     var inputValue by remember {
         mutableStateOf("")
     }
@@ -118,60 +140,136 @@ fun DetailsScreen() {
     )
 
 
+    val dummybodyPart = BodyPart(
+        "Chest",
+        true,
+        MeasuringUnit.CM.code,
+    )
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        Column(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            DetailsTopBar(
-                onDeleteIconClick = { isDeleteBodyPartDialogOpen = true },
-                onBackButtonClick = { },
-                bodyPart = BodyPart(
-                    "Chest",
-                    true,
-                    MeasuringUnit.CM.code,
-                ),
-                onUnitIconClick = { isBottomSheetOpen = true }
-            )
-            ChartTimeRangeButtons(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                selectedTimeRange = selectedTimeRange,
-                onClick = { selectedTimeRange = it },
-            )
+    when(windowSizeClass){
+        WindowWidthSizeClass.Compact ->{
+            Box(modifier = Modifier.fillMaxSize())
+            {
+                Column(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    DetailsTopBar(
+                        onDeleteIconClick = { isDeleteBodyPartDialogOpen = true },
+                        onBackButtonClick = { },
+                        bodyPart = dummybodyPart,
+                        onUnitIconClick = { isBottomSheetOpen = true }
+                    )
+                    ChartTimeRangeButtons(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        selectedTimeRange = selectedTimeRange,
+                        onClick = { selectedTimeRange = it },
+                    )
 
-            LineGraph(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .aspectRatio(ratio = 2 / 1f)
-                    .padding(16.dp),
-                bodyPartValues = dummyBodyPartValues
-            )
+                    LineGraph(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .aspectRatio(ratio = 2 / 1f)
+                            .padding(16.dp),
+                        bodyPartValues = dummyBodyPartValues
+                    )
 
-            Box(
-                modifier = Modifier.fillMaxSize(),
-            ) {
-                HistorySection(bodyPartValues = dummyBodyPartValues, measuringUnitCode = MeasuringUnit.CM.code) {}
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                    ) {
+                        HistorySection(bodyPartValues = dummyBodyPartValues, measuringUnitCode = MeasuringUnit.CM.code) {}
+                    }
+                }
+                NewValueInputBar(
+                    modifier = Modifier.align(Alignment.BottomCenter),
+                    date = datePickerState.selectedDateMillis.changeMillisToLocalDate().changeLocalDateToDateString(),
+                    isInputValueCardVisible = isInputValueCardVisible,
+                    value = inputValue,
+                    onValueChange = {inputValue = it},
+                    onDoneIconClick = {},
+                    onDoneImeActionClick = {focusManager.clearFocus()},
+                    onCalendarIconClick = {isDatePickerOpen = true}
+                )
+
+                InputCardHideIcon(
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(end = 8.dp),
+                    isInputValueCardVisible = isInputValueCardVisible,
+                    onClick = { isInputValueCardVisible = !isInputValueCardVisible }
+                )
             }
         }
-        NewValueInputBar(
-            modifier = Modifier.align(Alignment.BottomCenter),
-            date = "12 May 2024",
-            isInputValueCardVisible = isInputValueCardVisible,
-            value = inputValue,
-            onValueChange = {inputValue = it},
-            onDoneIconClick = {},
-            onDoneImeActionClick = {focusManager.clearFocus()},
-            onCalendarIconClick = {}
-        )
+        else ->{
+            Column(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                DetailsTopBar(
+                    onDeleteIconClick = { isDeleteBodyPartDialogOpen = true },
+                    onBackButtonClick = { },
+                    bodyPart = dummybodyPart,
+                    onUnitIconClick = { isBottomSheetOpen = true }
+                )
+                Row(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    Column(
+                        modifier = Modifier.fillMaxHeight().weight(1f),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        ChartTimeRangeButtons(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            selectedTimeRange = selectedTimeRange,
+                            onClick = { selectedTimeRange = it },
+                        )
 
-        InputCardHideIcon(
-            modifier = Modifier.align(Alignment.BottomEnd).padding(end = 8.dp),
-            isInputValueCardVisible = isInputValueCardVisible,
-            onClick = { isInputValueCardVisible = !isInputValueCardVisible }
-        )
+                        LineGraph(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .aspectRatio(ratio = 2 / 1f)
+                                .padding(16.dp),
+                            bodyPartValues = dummyBodyPartValues
+                        )
+
+                    }
+                    Box(
+                        modifier = Modifier.fillMaxSize().weight(1f)
+                    ){
+                        HistorySection(bodyPartValues = dummyBodyPartValues, measuringUnitCode = MeasuringUnit.CM.code) {}
+
+
+                NewValueInputBar(
+                    modifier = Modifier.align(Alignment.BottomCenter),
+                    date = datePickerState.selectedDateMillis.changeMillisToLocalDate().changeLocalDateToDateString(),
+                    isInputValueCardVisible = isInputValueCardVisible,
+                    value = inputValue,
+                    onValueChange = {inputValue = it},
+                    onDoneIconClick = {},
+                    onDoneImeActionClick = {focusManager.clearFocus()},
+                    onCalendarIconClick = {isDatePickerOpen = true}
+                )
+
+                InputCardHideIcon(
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(end = 8.dp),
+                    isInputValueCardVisible = isInputValueCardVisible,
+                    onClick = { isInputValueCardVisible = !isInputValueCardVisible }
+                )
+
+                    }
+                }
+
+            }
+        }
     }
+
+
+
 
 
 
@@ -390,6 +488,8 @@ fun InputCardHideIcon(
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun DetailsScreenPreview() {
-    DetailsScreen()
+    DetailsScreen(
+        windowSizeClass = WindowWidthSizeClass.Compact
+    )
     
 }
