@@ -59,11 +59,15 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.style.TextDecoration
 import com.haseeb.measuremate.domain.model.BodyPartValue
 import com.haseeb.measuremate.ui.component.LineGraph
+import com.haseeb.measuremate.ui.component.NewValueInputBar
 import com.haseeb.measuremate.ui.util.changeLocalDateToDateString
 import com.haseeb.measuremate.ui.util.roundToDecimal
 import java.time.LocalDate
@@ -72,6 +76,12 @@ import java.time.LocalDate
 @Composable
 fun DetailsScreen() {
     var selectedTimeRange by rememberSaveable { mutableStateOf(TimeRange.LAST7DAYS) }
+    var inputValue by remember {
+        mutableStateOf("")
+    }
+    var isInputValueCardVisible by rememberSaveable { mutableStateOf(true) }
+
+    val focusManager = LocalFocusManager.current
 
     val scope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -108,48 +118,70 @@ fun DetailsScreen() {
     )
 
 
-    Column(
-        modifier = Modifier.fillMaxSize()
-    )
-    {
-        DetailsTopBar(
-            onDeleteIconClick = {isDeleteBodyPartDialogOpen = true},
-            onBackButtonClick = {  },
-            bodyPart = BodyPart(
-                "Chest",
-                true,
-                MeasuringUnit.CM.code,
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            DetailsTopBar(
+                onDeleteIconClick = { isDeleteBodyPartDialogOpen = true },
+                onBackButtonClick = { },
+                bodyPart = BodyPart(
+                    "Chest",
+                    true,
+                    MeasuringUnit.CM.code,
                 ),
-            onUnitIconClick = {isBottomSheetOpen = true}
-        )
-        ChartTimeRangeButtons(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            selectedTimeRange = selectedTimeRange,
-            onClick = { selectedTimeRange = it },
-        )
+                onUnitIconClick = { isBottomSheetOpen = true }
+            )
+            ChartTimeRangeButtons(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                selectedTimeRange = selectedTimeRange,
+                onClick = { selectedTimeRange = it },
+            )
 
+            LineGraph(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(ratio = 2 / 1f)
+                    .padding(16.dp),
+                bodyPartValues = dummyBodyPartValues
+            )
 
-        LineGraph(
-            modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(ratio = 2 / 1f)
-                .padding(16.dp),
-            bodyPartValues = dummyBodyPartValues)
-
-        Box(
-            modifier = Modifier.fillMaxSize(),
-        ){
-            HistorySection(bodyPartValues = dummyBodyPartValues, measuringUnitCode = MeasuringUnit.CM.code) {}
+            Box(
+                modifier = Modifier.fillMaxSize(),
+            ) {
+                HistorySection(bodyPartValues = dummyBodyPartValues, measuringUnitCode = MeasuringUnit.CM.code) {}
+            }
         }
+        NewValueInputBar(
+            modifier = Modifier.align(Alignment.BottomCenter),
+            date = "12 May 2024",
+            isInputValueCardVisible = isInputValueCardVisible,
+            value = inputValue,
+            onValueChange = {inputValue = it},
+            onDoneIconClick = {},
+            onDoneImeActionClick = {focusManager.clearFocus()},
+            onCalendarIconClick = {}
+        )
 
+        InputCardHideIcon(
+            modifier = Modifier.align(Alignment.BottomEnd).padding(end = 8.dp),
+            isInputValueCardVisible = isInputValueCardVisible,
+            onClick = { isInputValueCardVisible = !isInputValueCardVisible }
+        )
     }
 
 
 
-
 }
+
+
+
+
+
+
 
 
 val dummyBodyPartValues = listOf(
@@ -334,6 +366,26 @@ private fun HistoryCard(
         }
     }
 }
+
+@Composable
+fun InputCardHideIcon(
+    modifier: Modifier = Modifier,
+    isInputValueCardVisible: Boolean,
+    onClick: () -> Unit
+) {
+    IconButton(
+        modifier = modifier,
+        onClick = { onClick() }
+    ) {
+        Icon(
+            imageVector = if (isInputValueCardVisible) Icons.Default.KeyboardArrowDown
+            else Icons.Default.KeyboardArrowUp,
+            contentDescription = "Close or Open Input Card"
+        )
+    }
+}
+
+
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
