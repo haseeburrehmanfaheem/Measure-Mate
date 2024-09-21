@@ -52,7 +52,11 @@ import com.haseeb.measuremate.ui.component.MeasuringUnitBottomSheet
 import kotlinx.coroutines.launch
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.runtime.remember
+import com.haseeb.measuremate.domain.model.BodyPartValue
+import com.haseeb.measuremate.ui.component.LineGraph
+import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -116,10 +120,32 @@ fun DetailsScreen() {
             onClick = { selectedTimeRange = it },
         )
 
+
+        LineGraph(
+            modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(ratio = 2 / 1f)
+                .padding(16.dp),
+            bodyPartValues = dummyBodyPartValues)
+
     }
     
 }
 
+
+val dummyBodyPartValues = listOf(
+    BodyPartValue(value = 72.0f, date = LocalDate.of(2023, 5, 10)),
+    BodyPartValue(value = 76.84865145f, date = LocalDate.of(2023, 5, 1)),
+    BodyPartValue(value = 74.0f, date = LocalDate.of(2023, 4, 20)),
+    BodyPartValue(value = 75.1f, date = LocalDate.of(2023, 4, 5)),
+    BodyPartValue(value = 66.3f, date = LocalDate.of(2023, 3, 15)),
+    BodyPartValue(value = 67.2f, date = LocalDate.of(2023, 3, 10)),
+    BodyPartValue(value = 73.5f, date = LocalDate.of(2023, 3, 1)),
+    BodyPartValue(value = 69.8f, date = LocalDate.of(2023, 2, 18)),
+    BodyPartValue(value = 68.4f, date = LocalDate.of(2023, 2, 1)),
+    BodyPartValue(value = 72.0f, date = LocalDate.of(2023, 1, 22)),
+    BodyPartValue(value = 70.5f, date = LocalDate.of(2023, 1, 14))
+)
 @Composable
 private fun ChartTimeRangeButtons(
     modifier: Modifier = Modifier,
