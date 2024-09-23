@@ -3,7 +3,9 @@ agp = "8.5.1"
 coilCompose = "2.7.0"
 coreSplashscreen = "1.0.1"
 desugar_jdk_libs = "2.1.2"
-kotlin = "2.0.0"
+hiltAndroid = "2.51.1"
+hiltCompiler = "1.2.0"
+kotlin = "2.0.20"
 coreKtx = "1.13.1"
 junit = "4.13.2"
 junitVersion = "1.2.1"
@@ -21,6 +23,8 @@ uiTextGoogleFonts = "1.7.1"
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreen" }
+androidx-hilt-compiler = { module = "androidx.hilt:hilt-compiler", version.ref = "hiltCompiler" }
+androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltCompiler" }
 androidx-lifecycle-runtime-ktx-v241 = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtxVersion" }
 androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleViewmodelCompose" }
 androidx-material3-window-sizeClassAndroid = { module = "androidx.compose.material3:material3-window-size-class-android", version.ref = "material3WindowSizeClassAndroid" }
@@ -28,6 +32,8 @@ androidx-navigation-compose = { module = "androidx.navigation:navigation-compose
 androidx-ui-text-google-fonts = { module = "androidx.compose.ui:ui-text-google-fonts", version.ref = "uiTextGoogleFonts" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
 desugar_jdk_libs = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugar_jdk_libs" }
+hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
+hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroid" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
