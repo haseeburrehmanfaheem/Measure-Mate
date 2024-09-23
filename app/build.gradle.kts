@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.compose.compiler)
+    kotlin("plugin.serialization") version "2.0.20"
 }
 
 android {
@@ -80,4 +81,8 @@ dependencies {
     implementation(libs.androidx.material3.window.sizeClassAndroid)
     implementation(libs.coil.compose)
     coreLibraryDesugaring(libs.desugar.jdk.libs)
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.kotlinx.serialization.json)
+
+    implementation(libs.androidx.core.splashscreen)
 }

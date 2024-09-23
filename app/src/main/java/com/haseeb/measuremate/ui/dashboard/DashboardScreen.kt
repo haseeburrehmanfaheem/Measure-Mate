@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -50,7 +51,12 @@ import com.haseeb.measuremate.ui.theme.MeasureMateTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DashboardScreen(){
+fun DashboardScreen(
+    onFabClicked: () -> Unit,
+    onItemCardClicked : (String) -> Unit,
+    paddingValues: PaddingValues
+
+){
     var isSignOutDialogOpen by rememberSaveable { mutableStateOf(false) }
 
     var isProfileBottomSheetOpen by remember {
@@ -90,7 +96,7 @@ fun DashboardScreen(){
     )
 
     Box(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize().padding(paddingValues)
     ){
         Column(
             modifier = Modifier.fillMaxSize()
@@ -110,14 +116,17 @@ fun DashboardScreen(){
             ) {
                 items(predefinedBodyParts){
                     ItemCart(
-                        bodyPart = it
+                        bodyPart = it,
+                        onItemCardClicked = { bodyPartId ->
+                            onItemCardClicked(bodyPartId)
+                        }
                     )
                 }
             }
 
         }
         FloatingActionButton(
-            onClick = { },
+            onClick = { onFabClicked()},
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(24.dp)
@@ -143,6 +152,7 @@ private fun DashboardTopBar(
 ){
     TopAppBar(
         modifier = modifier,
+        windowInsets = WindowInsets(0.dp, 0.dp, 0.dp, 0.dp),
         title = { Text(text = "MeasureMate") },
         actions = {
             IconButton(onClick = {onProfilePicClick()}) {
@@ -162,9 +172,12 @@ private fun DashboardTopBar(
 @Composable
 private fun ItemCart(
     modifier: Modifier = Modifier,
-    bodyPart: BodyPart
+    bodyPart: BodyPart,
+    onItemCardClicked: (String) -> Unit
 ){
-    Card {
+    Card(
+        onClick = { bodyPart.bodyPartId?.let { onItemCardClicked(it) } }
+    ) {
         Row (
             modifier = modifier
                 .padding(16.dp),
@@ -205,6 +218,10 @@ private fun ItemCart(
 private fun DashboardScreenPreview(){
 
     MeasureMateTheme {
-        DashboardScreen()
+        DashboardScreen(
+            onFabClicked = {},
+            onItemCardClicked = {},
+            paddingValues = PaddingValues(0.dp, 0.dp, 0.dp, 0.dp)
+        )
     }
 }

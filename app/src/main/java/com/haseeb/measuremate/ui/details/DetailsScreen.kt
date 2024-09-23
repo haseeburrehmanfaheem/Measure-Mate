@@ -54,6 +54,7 @@ import kotlinx.coroutines.launch
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.lazy.LazyColumn
@@ -82,7 +83,10 @@ import java.time.LocalDate
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetailsScreen(
-    windowSizeClass : WindowWidthSizeClass
+    bodyPartId : String ,
+    windowSizeClass : WindowWidthSizeClass,
+    onBackButtonClick : () -> Unit = {},
+    paddingValues: PaddingValues
 ) {
 
 
@@ -141,7 +145,7 @@ fun DetailsScreen(
 
 
     val dummybodyPart = BodyPart(
-        "Chest",
+        "Chest $bodyPartId",
         true,
         MeasuringUnit.CM.code,
     )
@@ -151,11 +155,11 @@ fun DetailsScreen(
             Box(modifier = Modifier.fillMaxSize())
             {
                 Column(
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier.fillMaxSize().padding(paddingValues)
                 ) {
                     DetailsTopBar(
                         onDeleteIconClick = { isDeleteBodyPartDialogOpen = true },
-                        onBackButtonClick = { },
+                        onBackButtonClick = {onBackButtonClick() },
                         bodyPart = dummybodyPart,
                         onUnitIconClick = { isBottomSheetOpen = true }
                     )
@@ -207,7 +211,7 @@ fun DetailsScreen(
             ) {
                 DetailsTopBar(
                     onDeleteIconClick = { isDeleteBodyPartDialogOpen = true },
-                    onBackButtonClick = { },
+                    onBackButtonClick = { onBackButtonClick()},
                     bodyPart = dummybodyPart,
                     onUnitIconClick = { isBottomSheetOpen = true }
                 )
@@ -363,6 +367,7 @@ private fun DetailsTopBar(
 ){
     TopAppBar(
         modifier = modifier,
+        windowInsets = WindowInsets(0.dp, 0.dp, 0.dp, 0.dp),
         title = {
             Text(
                 text = bodyPart?.name ?: "",
@@ -489,7 +494,10 @@ fun InputCardHideIcon(
 @Composable
 private fun DetailsScreenPreview() {
     DetailsScreen(
-        windowSizeClass = WindowWidthSizeClass.Compact
+        bodyPartId = "1",
+        windowSizeClass = WindowWidthSizeClass.Compact,
+        onBackButtonClick = {},
+        paddingValues = PaddingValues(0.dp)
     )
     
 }

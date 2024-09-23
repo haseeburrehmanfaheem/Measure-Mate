@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -48,7 +49,10 @@ import com.haseeb.measuremate.ui.component.ProfilePicPlaceholder
 
 
 @Composable
-fun AddItemScreen() {
+fun AddItemScreen(
+    onBackButtonClick: () -> Unit,
+    paddingValues: PaddingValues
+) {
     var isAddNewItemDialogOpen by rememberSaveable { mutableStateOf(false) }
 
     Dialog(
@@ -66,11 +70,11 @@ fun AddItemScreen() {
         isOpen = isAddNewItemDialogOpen
     )
     Column(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize().padding(paddingValues)
     ) {
         AddItemTopBar(
             onAddIconClick = { isAddNewItemDialogOpen = true },
-            onBackButtonClick = {}
+            onBackButtonClick = {onBackButtonClick()}
         )
         LazyVerticalGrid(
             modifier = Modifier.fillMaxSize(),
@@ -101,7 +105,8 @@ private fun AddItemTopBar(
 ){
     TopAppBar(
         modifier = modifier,
-        title = { Text(text = "Add New Item") },
+        windowInsets = WindowInsets(0.dp, 0.dp, 0.dp, 0.dp),
+        title = { Text(text = "Add Item") },
         navigationIcon = {
             IconButton(onClick = {onBackButtonClick()}) {
                 Icon(imageVector = Icons.AutoMirrored.Default.ArrowBack, contentDescription = "Navigate back" )
@@ -149,6 +154,6 @@ private fun ItemCart(
 @Preview
 @Composable
 private fun AddItemScreenPreview() {
-    AddItemScreen()
+    AddItemScreen({}, PaddingValues(0.dp))
 
 }
