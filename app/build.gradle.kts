@@ -5,6 +5,7 @@ plugins {
     kotlin("plugin.serialization") version "2.0.20"
     id("com.google.dagger.hilt.android") version "2.49"
     id("com.google.devtools.ksp")
+    id("com.google.gms.google-services")
 
 }
 
@@ -14,7 +15,7 @@ android {
 
     defaultConfig {
         applicationId = "com.haseeb.measuremate"
-        minSdk = 21
+        minSdk = 23
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -96,4 +97,7 @@ dependencies {
 
 
     implementation(libs.androidx.hilt.navigation.compose)
+
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.auth)
 }

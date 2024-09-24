@@ -26,7 +26,7 @@ fun NavGraphSetup(
 ) {
     NavHost(
         navController = navController,
-        startDestination =  Routes.DashboardScreen){
+        startDestination =  Routes.SignInScreen){
         composable<Routes.DashboardScreen>{
             DashboardScreen(
                 onFabClicked = {navController.navigate(Routes.AddItemScreen)},
