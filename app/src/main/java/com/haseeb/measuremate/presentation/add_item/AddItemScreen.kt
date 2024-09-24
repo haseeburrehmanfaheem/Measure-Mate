@@ -21,6 +21,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -40,7 +41,8 @@ import com.haseeb.measuremate.presentation.component.Dialog
 @Composable
 fun AddItemScreen(
     onBackButtonClick: () -> Unit,
-    paddingValues: PaddingValues
+    paddingValues: PaddingValues,
+    snackbarHostState: SnackbarHostState
 ) {
     var isAddNewItemDialogOpen by rememberSaveable { mutableStateOf(false) }
 
@@ -143,6 +145,6 @@ private fun ItemCart(
 @Preview
 @Composable
 private fun AddItemScreenPreview() {
-    AddItemScreen({}, PaddingValues(0.dp))
+    AddItemScreen({}, PaddingValues(0.dp), SnackbarHostState())
 
 }

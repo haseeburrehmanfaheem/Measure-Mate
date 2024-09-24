@@ -26,6 +26,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -53,7 +54,8 @@ import com.haseeb.measuremate.presentation.theme.MeasureMateTheme
 fun DashboardScreen(
     onFabClicked: () -> Unit,
     onItemCardClicked : (String) -> Unit,
-    paddingValues: PaddingValues
+    paddingValues: PaddingValues,
+    snackbarHostState: SnackbarHostState
 
 ){
     var isSignOutDialogOpen by rememberSaveable { mutableStateOf(false) }
@@ -220,7 +222,8 @@ private fun DashboardScreenPreview(){
         DashboardScreen(
             onFabClicked = {},
             onItemCardClicked = {},
-            paddingValues = PaddingValues(0.dp, 0.dp, 0.dp, 0.dp)
+            paddingValues = PaddingValues(0.dp, 0.dp, 0.dp, 0.dp),
+            snackbarHostState = SnackbarHostState()
         )
     }
 }

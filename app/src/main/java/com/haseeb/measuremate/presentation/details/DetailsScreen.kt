@@ -61,6 +61,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.ui.platform.LocalFocusManager
@@ -81,7 +82,8 @@ fun DetailsScreen(
     bodyPartId : String ,
     windowSizeClass : WindowWidthSizeClass,
     onBackButtonClick : () -> Unit = {},
-    paddingValues: PaddingValues
+    paddingValues: PaddingValues,
+    snackbarHostState: SnackbarHostState
 ) {
 
 
@@ -492,7 +494,8 @@ private fun DetailsScreenPreview() {
         bodyPartId = "1",
         windowSizeClass = WindowWidthSizeClass.Compact,
         onBackButtonClick = {},
-        paddingValues = PaddingValues(0.dp)
+        paddingValues = PaddingValues(0.dp),
+        snackbarHostState = SnackbarHostState()
     )
     
 }

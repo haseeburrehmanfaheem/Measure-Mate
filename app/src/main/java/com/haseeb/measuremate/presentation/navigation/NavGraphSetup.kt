@@ -3,6 +3,7 @@ package com.haseeb.measuremate.presentation.navigation
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -22,7 +23,8 @@ import com.haseeb.measuremate.presentation.signin.SignInViewModel
 fun NavGraphSetup(
     navController: NavHostController,
     windowSize : WindowWidthSizeClass,
-    paddingValues: PaddingValues
+    paddingValues: PaddingValues,
+    snackbarHostState: SnackbarHostState
 ) {
     NavHost(
         navController = navController,
@@ -35,7 +37,8 @@ fun NavGraphSetup(
                         Routes.DetailsScreen(it)
                     )
                 },
-                paddingValues = paddingValues
+                paddingValues = paddingValues,
+                snackbarHostState = snackbarHostState
             )
         }
         composable<Routes.SignInScreen> {
@@ -45,7 +48,9 @@ fun NavGraphSetup(
                 windowSize = windowSize,
                 paddingValues = paddingValues,
                 state = state,
-                onEvent = signInViewModel::onEvent
+                onEvent = signInViewModel::onEvent,
+                snackbarHostState = snackbarHostState,
+                uiEvent = signInViewModel.uiEvent
             )
         }
         composable<Routes.AddItemScreen>(
@@ -62,7 +67,8 @@ fun NavGraphSetup(
         ) {
             AddItemScreen(
                 onBackButtonClick = {navController.navigateUp()},
-                paddingValues = paddingValues
+                paddingValues = paddingValues,
+                snackbarHostState = snackbarHostState
             )
         }
         composable<Routes.DetailsScreen>(
@@ -82,7 +88,8 @@ fun NavGraphSetup(
                 bodyPartId = bodyPartId,
                 windowSizeClass = windowSize,
                 onBackButtonClick = {navController.navigateUp()},
-                paddingValues = paddingValues
+                paddingValues = paddingValues,
+                snackbarHostState = snackbarHostState
             )
         }
 

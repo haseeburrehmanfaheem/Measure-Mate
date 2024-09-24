@@ -5,8 +5,11 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
+import androidx.compose.runtime.remember
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.rememberNavController
 import com.haseeb.measuremate.presentation.navigation.NavGraphSetup
@@ -28,11 +31,17 @@ class MainActivity : ComponentActivity() {
 //                AddItemScreen()
 //                DashboardScreen()
 //                DetailsScreen(windowSizeClass = windowSizeClass.widthSizeClass)
-                Scaffold { paddingValues ->
+                val snackbarHostState = remember {
+                    SnackbarHostState()
+                }
+                Scaffold(
+                    snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
+                ) { paddingValues ->
                     NavGraphSetup(
                         navController = navController,
                         windowSize = windowSizeClass.widthSizeClass,
-                        paddingValues = paddingValues
+                        paddingValues = paddingValues,
+                        snackbarHostState = snackbarHostState
                     )
                 }
 

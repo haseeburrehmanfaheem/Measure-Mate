@@ -12,9 +12,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -31,6 +33,9 @@ import com.haseeb.measuremate.presentation.component.AnonymousSignInButton
 import com.haseeb.measuremate.presentation.component.Dialog
 import com.haseeb.measuremate.presentation.component.GoogleSignInButton
 import com.haseeb.measuremate.presentation.theme.MeasureMateTheme
+import com.haseeb.measuremate.presentation.util.UiEvent
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 
 
 @Composable
@@ -38,8 +43,22 @@ fun SignInScreen(
     windowSize : WindowWidthSizeClass,
     paddingValues: PaddingValues,
     state: SignInState,
+    snackbarHostState: SnackbarHostState,
+    uiEvent : Flow<UiEvent>,
     onEvent : (SignInEvent) -> Unit
 ){
+
+    LaunchedEffect(key1 = Unit) {
+        uiEvent.collect {
+            event -> when(event){
+            is UiEvent.ShowSnackbar -> {
+                snackbarHostState.showSnackbar(event.message)
+            }
+        }
+        }
+
+    }
+
     val context = LocalContext.current
 
     var isSignInAnonymousDialogOpen by rememberSaveable { mutableStateOf(false) }
@@ -61,7 +80,9 @@ fun SignInScreen(
     when(windowSize){
         WindowWidthSizeClass.Compact -> {
             Column(
-                modifier = Modifier.fillMaxSize().padding(paddingValues),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
@@ -154,7 +175,9 @@ private fun SignInScreenPreview(){
             windowSize = WindowWidthSizeClass.Compact,
             paddingValues = PaddingValues(0.dp),
             state = SignInState(),
-            onEvent = {}
+            onEvent = {},
+            snackbarHostState = SnackbarHostState(),
+            uiEvent = emptyFlow()
         )
     }
 }
