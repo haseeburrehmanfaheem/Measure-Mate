@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "1052991127812",
-    "project_id": "measuremate-5f303",
-    "storage_bucket": "measuremate-5f303.appspot.com"
+    "project_number": "681162344855",
+    "project_id": "measuremate-67ef5",
+    "storage_bucket": "measuremate-67ef5.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1052991127812:android:8e623dee441a42329d9051",
+        "mobilesdk_app_id": "1:681162344855:android:2da94de227398ab2875cd2",
         "android_client_info": {
           "package_name": "com.haseeb.measuremate"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyC6fE56r3uIQvQ_ghzJyDrKQ3OxOPOZ1QE"
+          "current_key": "AIzaSyBfiYs1-ggfUAh1pfkJRlLEYgPATotm_Do"
         }
       ],
       "services": {

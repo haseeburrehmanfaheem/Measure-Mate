@@ -1,14 +1,19 @@
 package com.haseeb.measuremate.presentation.signin
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.haseeb.measuremate.domain.model.AuthStatus
 import com.haseeb.measuremate.domain.repository.AuthRepository
 import com.haseeb.measuremate.presentation.util.UiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.WhileSubscribed
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -17,6 +22,16 @@ import javax.inject.Inject
 class SignInViewModel @Inject constructor(
     private val authRepository: AuthRepository
 ) : ViewModel() {
+
+
+    val authStatus = authRepository.authStatus
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(
+                stopTimeoutMillis = 5000
+            ),
+            initialValue = AuthStatus.LOADING,
+        )
 
     private val _uiEvent = Channel<UiEvent>()
     val uiEvent = _uiEvent.receiveAsFlow()
@@ -30,6 +45,7 @@ class SignInViewModel @Inject constructor(
                 signInAnonymously()
             }
             is SignInEvent.SignInWithGoogle -> {
+                signInWithGoogle(event.context)
 
             }
         }
@@ -49,6 +65,23 @@ class SignInViewModel @Inject constructor(
             }
             _state.update {
                 it.copy(isAnonymousSignInButtonLoading = false)
+            }
+        }
+    }
+
+
+    private fun signInWithGoogle(context: Context){
+        viewModelScope.launch {
+            _state.update {
+                it.copy(isGoogleSignInButtonLoading = true)
+            }
+            authRepository.SignIn(context).onSuccess {
+                _uiEvent.send(UiEvent.ShowSnackbar("Signed in with Google"))
+            }.onFailure {
+                _uiEvent.send(UiEvent.ShowSnackbar("Failed to sign in with Google ${it.message}"))
+            }
+            _state.update {
+                it.copy(isGoogleSignInButtonLoading = false)
             }
         }
     }

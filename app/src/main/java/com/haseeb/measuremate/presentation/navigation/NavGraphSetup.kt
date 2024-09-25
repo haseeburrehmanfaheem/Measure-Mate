@@ -24,11 +24,12 @@ fun NavGraphSetup(
     navController: NavHostController,
     windowSize : WindowWidthSizeClass,
     paddingValues: PaddingValues,
-    snackbarHostState: SnackbarHostState
+    snackbarHostState: SnackbarHostState,
+    signInViewModel: SignInViewModel
 ) {
     NavHost(
         navController = navController,
-        startDestination =  Routes.SignInScreen){
+        startDestination =  Routes.DashboardScreen){
         composable<Routes.DashboardScreen>{
             DashboardScreen(
                 onFabClicked = {navController.navigate(Routes.AddItemScreen)},
@@ -42,7 +43,7 @@ fun NavGraphSetup(
             )
         }
         composable<Routes.SignInScreen> {
-            val signInViewModel : SignInViewModel = hiltViewModel()
+
             val state by signInViewModel.state.collectAsStateWithLifecycle()
             SignInScreen(
                 windowSize = windowSize,
