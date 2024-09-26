@@ -5,7 +5,9 @@ import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.snapshots
 import com.haseeb.measuremate.data.mapper.UserDto
+import com.haseeb.measuremate.data.mapper.toBodyPartDto
 import com.haseeb.measuremate.data.mapper.toUser
+import com.haseeb.measuremate.data.util.Constants.BODY_PART_COLLECTION
 import com.haseeb.measuremate.data.util.Constants.USER_COLLECTION
 import com.haseeb.measuremate.domain.model.BodyPart
 import com.haseeb.measuremate.domain.model.BodyPartValue
@@ -23,6 +25,15 @@ class DatabaseRepositoryImpl(
     private fun userCollection(): CollectionReference {
         return firebaseFirestore
             .collection(USER_COLLECTION)
+    }
+
+    private fun bodyPartCollection(
+        userId: String = firebaseAuth.currentUser?.uid.orEmpty()
+    ): CollectionReference {
+        return firebaseFirestore
+            .collection(USER_COLLECTION)
+            .document(userId)
+            .collection(BODY_PART_COLLECTION)
     }
 
 
@@ -84,9 +95,19 @@ class DatabaseRepositoryImpl(
 //        TODO("Not yet implemented")
 //    }
 //
-//    override suspend fun upsertBodyPart(bodyPart: BodyPart): Result<Boolean> {
-//        TODO("Not yet implemented")
-//    }
+override suspend fun upsertBodyPart(bodyPart: BodyPart): Result<Boolean> {
+    return try {
+        val documentId = bodyPart.bodyPartId ?: bodyPartCollection().document().id
+        val bodyPartDto = bodyPart.toBodyPartDto().copy(bodyPartId = documentId)
+        bodyPartCollection()
+            .document(documentId)
+            .set(bodyPartDto)
+            .await()
+        Result.success(value = true)
+    } catch (e: Exception) {
+        Result.failure(e)
+    }
+}
 //
 //    override suspend fun deleteBodyPart(bodyPartId: String): Result<Boolean> {
 //        TODO("Not yet implemented")

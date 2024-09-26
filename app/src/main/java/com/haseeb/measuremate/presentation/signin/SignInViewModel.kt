@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.haseeb.measuremate.domain.model.AuthStatus
+import com.haseeb.measuremate.domain.model.predefinedBodyParts
 import com.haseeb.measuremate.domain.repository.AuthRepository
 import com.haseeb.measuremate.domain.repository.DatabaseRepository
 import com.haseeb.measuremate.presentation.util.UiEvent
@@ -61,12 +62,18 @@ class SignInViewModel @Inject constructor(
             authRepository.SignInAnonymously().onSuccess {
                 databaseRepository.addUser()
                     .onSuccess {
-//                        _uiEvent.send(UiEvent.ShowSnackbar("Signed in with Google"))
+
+                        try {
+                            insertPredefinedBodyParts()
+                            _uiEvent.send(UiEvent.ShowSnackbar("Signed in"))
+                        } catch (e: Exception) {
+                            _uiEvent.send(UiEvent.ShowSnackbar("Signed in, but failed to insert predefined body parts ${e.message}"))
+                        }
                     }
                     .onFailure {
                         _uiEvent.send(UiEvent.ShowSnackbar("Failed to sign in ${it.message}"))
                     }
-                _uiEvent.send(UiEvent.ShowSnackbar("Signed in anonymously"))
+//                _uiEvent.send(UiEvent.ShowSnackbar("Signed in anonymously"))
 
 
             }.onFailure {
@@ -88,7 +95,12 @@ class SignInViewModel @Inject constructor(
                 if(isNewUser){
                     databaseRepository.addUser()
                         .onSuccess {
-                            _uiEvent.send(UiEvent.ShowSnackbar("Signed in with Google"))
+                            try {
+                                insertPredefinedBodyParts()
+                                _uiEvent.send(UiEvent.ShowSnackbar("Signed in with Google"))
+                            } catch (e: Exception) {
+                                _uiEvent.send(UiEvent.ShowSnackbar("Signed in, but failed to insert predefined body parts ${e.message}"))
+                            }
                         }
                         .onFailure {
                             _uiEvent.send(UiEvent.ShowSnackbar("Failed to sign in with Google ${it.message}"))
@@ -104,4 +116,11 @@ class SignInViewModel @Inject constructor(
             }
         }
     }
+    private suspend fun insertPredefinedBodyParts() {
+        predefinedBodyParts.forEach { bodyPart ->
+            databaseRepository.upsertBodyPart(bodyPart)
+        }
+    }
+
+
 }

@@ -16,7 +16,6 @@ val predefinedBodyParts: List<BodyPart> = listOf(
         name = "Waist",
         isActive = true,
         measuringUnit = MeasuringUnit.CM.code,
-        bodyPartId = "213"
     ),
     BodyPart(
         name = "Body Fat",
