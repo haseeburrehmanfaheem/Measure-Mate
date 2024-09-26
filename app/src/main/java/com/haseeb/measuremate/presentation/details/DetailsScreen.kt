@@ -179,7 +179,7 @@ fun DetailsScreen(
 
     when(windowSizeClass){
         WindowWidthSizeClass.Compact ->{
-            Box(modifier = Modifier.fillMaxSize())
+            Box(modifier = Modifier.fillMaxSize().padding(paddingValues))
             {
                 Column(
                     modifier = Modifier.fillMaxSize().padding(paddingValues)
