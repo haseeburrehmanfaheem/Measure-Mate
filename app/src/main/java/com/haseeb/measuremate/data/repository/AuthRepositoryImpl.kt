@@ -94,4 +94,27 @@ class AuthRepositoryImpl(
             Result.failure(e)
         }
     }
+
+
+    override suspend fun anonymousUserSignInWithGoogle(context: Context): Result<Boolean> {
+        return try {
+            val authCredentialResult = getGoogleAuthCredentials(context)
+            if (authCredentialResult.isSuccess) {
+                val authCredential = authCredentialResult.getOrNull()
+                if (authCredential != null) {
+                    firebaseAuth.currentUser?.linkWithCredential(authCredential)?.await()
+                    Result.success(value = true)
+                } else {
+                    Result.failure(IllegalArgumentException("Auth Credential is null"))
+                }
+            } else {
+                Result.failure(authCredentialResult.exceptionOrNull() ?: Exception("Unknown Error"))
+            }
+        }  catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+
+
 }

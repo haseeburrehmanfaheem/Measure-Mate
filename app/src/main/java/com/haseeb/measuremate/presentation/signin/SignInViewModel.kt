@@ -59,6 +59,13 @@ class SignInViewModel @Inject constructor(
                 it.copy(isAnonymousSignInButtonLoading = true)
             }
             authRepository.SignInAnonymously().onSuccess {
+                databaseRepository.addUser()
+                    .onSuccess {
+//                        _uiEvent.send(UiEvent.ShowSnackbar("Signed in with Google"))
+                    }
+                    .onFailure {
+                        _uiEvent.send(UiEvent.ShowSnackbar("Failed to sign in ${it.message}"))
+                    }
                 _uiEvent.send(UiEvent.ShowSnackbar("Signed in anonymously"))
 
 

@@ -39,6 +39,8 @@ fun NavGraphSetup(
             is UiEvent.ShowSnackbar -> {
                 snackbarHostState.showSnackbar(event.message)
             }
+
+            UiEvent.HideBottomSheet -> {}
         }
         }
 

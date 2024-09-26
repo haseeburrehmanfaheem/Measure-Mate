@@ -55,7 +55,30 @@ class DashboardViewModel @Inject constructor(
                 signOut()
             }
 
-            is DashboardEvent.AnonymousUserSignInWithGoogle -> TODO()
+            is DashboardEvent.AnonymousUserSignInWithGoogle -> {
+                anonymousUserSignInWithGoogle(event.context)
+            }
+        }
+    }
+
+    private fun anonymousUserSignInWithGoogle(context: Context) {
+        viewModelScope.launch {
+            _state.update { it.copy(isSignInButtonLoading = true) }
+            authRepository.anonymousUserSignInWithGoogle(context)
+                .onSuccess {
+                    databaseRepository.addUser()
+                        .onSuccess {
+                            _uiEvent
+                            _uiEvent.send(UiEvent.ShowSnackbar(message = "Signed in successfully"))
+                        }
+                        .onFailure { e ->
+                            _uiEvent.send(UiEvent.ShowSnackbar(message = "Couldn't add user. ${e.message}"))
+                        }
+                }
+                .onFailure { e ->
+                    _uiEvent.send(UiEvent.ShowSnackbar(message = "Couldn't sign in. ${e.message}"))
+                }
+            _state.update { it.copy(isSignInButtonLoading = false) }
         }
     }
 
@@ -64,12 +87,13 @@ class DashboardViewModel @Inject constructor(
 
             authRepository.SignOut()
                 .onSuccess {
+                    _uiEvent.send(UiEvent.HideBottomSheet)
 
                     _uiEvent.send(UiEvent.ShowSnackbar(message = "Signed out successfully"))
                 }
                 .onFailure { e ->
-
                     _uiEvent.send(UiEvent.ShowSnackbar(message = "Couldn't signed out. ${e.message}"))
+                    _uiEvent.send(UiEvent.HideBottomSheet)
                 }
 
         }

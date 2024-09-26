@@ -29,11 +29,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -53,6 +55,7 @@ import com.haseeb.measuremate.presentation.theme.MeasureMateTheme
 import com.haseeb.measuremate.presentation.util.UiEvent
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -66,6 +69,11 @@ fun DashboardScreen(
     onEvent: (DashboardEvent)->Unit
 ){
     val context = LocalContext.current
+    var isProfileBottomSheetOpen by remember {
+        mutableStateOf(false)
+    }
+    val scope = rememberCoroutineScope()
+    val bottomSheetState = rememberModalBottomSheetState()
 
     LaunchedEffect(key1 = Unit) {
         uiEvent.collect {
@@ -73,15 +81,26 @@ fun DashboardScreen(
             is UiEvent.ShowSnackbar -> {
                 snackbarHostState.showSnackbar(event.message)
             }
+
+
+            UiEvent.HideBottomSheet -> {
+                scope
+                    .launch { bottomSheetState.hide() }
+                    .invokeOnCompletion {
+                        if (!bottomSheetState.isVisible) {
+                            isProfileBottomSheetOpen = false
+                        }
+                    }
+
+
+            }
         }
         }
 
     }
     var isSignOutDialogOpen by rememberSaveable { mutableStateOf(false) }
 
-    var isProfileBottomSheetOpen by remember {
-        mutableStateOf(false)
-    }
+
 
 
     val isAnonymousUser = state.user?.isAnonymous ?: true
@@ -95,7 +114,8 @@ fun DashboardScreen(
         buttonPrimaryText = if (isAnonymousUser) "Sign In With Google" else "Sign Out",
         onGoogleButtonClick = {
             if (isAnonymousUser) onEvent(DashboardEvent.AnonymousUserSignInWithGoogle(context)) else isSignOutDialogOpen = true
-        }
+        },
+        sheetState = bottomSheetState
     )
 
     Dialog(

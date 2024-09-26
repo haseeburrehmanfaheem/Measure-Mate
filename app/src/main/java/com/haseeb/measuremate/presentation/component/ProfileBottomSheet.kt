@@ -10,6 +10,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -26,10 +27,12 @@ fun ProfileBottomSheet(
     user: User? ,
     buttonPrimaryText : String,
     onGoogleButtonClick : () -> Unit,
-    onDismissRequest: () -> Unit
+    onDismissRequest: () -> Unit,
+    sheetState: SheetState
 ) {
     if(isOpen){
         ModalBottomSheet(
+            sheetState = sheetState,
             modifier = modifier,
             onDismissRequest = { onDismissRequest() },
             dragHandle = {
