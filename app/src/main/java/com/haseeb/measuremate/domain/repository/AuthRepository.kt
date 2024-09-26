@@ -11,4 +11,6 @@ interface AuthRepository {
     suspend fun SignInAnonymously() : Result<Boolean>
 
     suspend fun SignIn(context: Context) : Result<Boolean>
+
+    suspend fun SignOut() : Result<Boolean>
 }

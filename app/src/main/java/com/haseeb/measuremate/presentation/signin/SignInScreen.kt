@@ -48,16 +48,7 @@ fun SignInScreen(
     onEvent : (SignInEvent) -> Unit
 ){
 
-    LaunchedEffect(key1 = Unit) {
-        uiEvent.collect {
-            event -> when(event){
-            is UiEvent.ShowSnackbar -> {
-                snackbarHostState.showSnackbar(event.message)
-            }
-        }
-        }
 
-    }
 
     val context = LocalContext.current
 
@@ -117,7 +108,7 @@ fun SignInScreen(
         }
         else -> {
             Row (
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.fillMaxSize().padding(paddingValues),
             ) {
                 Column(
                     modifier = Modifier
@@ -148,14 +139,17 @@ fun SignInScreen(
 
                     GoogleSignInButton(
                         onClick = {
-
-                        }
+                            onEvent(SignInEvent.SignInWithGoogle(context))
+                        },
+                        loadingState = state.isGoogleSignInButtonLoading
                     )
                     Spacer(modifier = Modifier.height(20.dp))
                     AnonymousSignInButton(
                         onClick = {
+
                             isSignInAnonymousDialogOpen = true
-                        }
+                        },
+                        loadingState = state.isAnonymousSignInButtonLoading
                     )
                 }
             }

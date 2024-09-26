@@ -30,6 +30,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,6 +39,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -48,6 +50,9 @@ import com.haseeb.measuremate.presentation.component.Dialog
 import com.haseeb.measuremate.presentation.component.ProfileBottomSheet
 import com.haseeb.measuremate.presentation.component.ProfilePicPlaceholder
 import com.haseeb.measuremate.presentation.theme.MeasureMateTheme
+import com.haseeb.measuremate.presentation.util.UiEvent
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -55,30 +60,41 @@ fun DashboardScreen(
     onFabClicked: () -> Unit,
     onItemCardClicked : (String) -> Unit,
     paddingValues: PaddingValues,
-    snackbarHostState: SnackbarHostState
-
+    snackbarHostState: SnackbarHostState,
+    uiEvent : Flow<UiEvent>,
+    state: DashboardState,
+    onEvent: (DashboardEvent)->Unit
 ){
+    val context = LocalContext.current
+
+    LaunchedEffect(key1 = Unit) {
+        uiEvent.collect {
+                event -> when(event){
+            is UiEvent.ShowSnackbar -> {
+                snackbarHostState.showSnackbar(event.message)
+            }
+        }
+        }
+
+    }
     var isSignOutDialogOpen by rememberSaveable { mutableStateOf(false) }
 
     var isProfileBottomSheetOpen by remember {
         mutableStateOf(false)
     }
-    val user = User(
-        name = "Haseeb",
-        email = "haseebrehman208@gmail.com",
-        profilePictureUrl = "",
-        isAnonymous = false
-    )
+
+
+    val isAnonymousUser = state.user?.isAnonymous ?: true
     ProfileBottomSheet(
         isOpen = isProfileBottomSheetOpen,
-        user = user,
+        user = state.user,
         onDismissRequest = {
             isProfileBottomSheetOpen = false
         },
-        buttonLoadingState = false,
-        buttonPrimaryText = "Sign out with Google",
+        buttonLoadingState = if (isAnonymousUser) state.isSignOutButtonLoading else state.isSignOutButtonLoading,
+        buttonPrimaryText = if (isAnonymousUser) "Sign In With Google" else "Sign Out",
         onGoogleButtonClick = {
-            isSignOutDialogOpen = true
+            if (isAnonymousUser) onEvent(DashboardEvent.AnonymousUserSignInWithGoogle(context)) else isSignOutDialogOpen = true
         }
     )
 
@@ -88,6 +104,7 @@ fun DashboardScreen(
         },
         onConfirm = {
             isSignOutDialogOpen = false
+            onEvent(DashboardEvent.SignOut)
         },
         title = "Sign Out",
         body = {
@@ -97,13 +114,15 @@ fun DashboardScreen(
     )
 
     Box(
-        modifier = Modifier.fillMaxSize().padding(paddingValues)
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(paddingValues)
     ){
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
             DashboardTopBar(
-                profilePictureUrl = user.profilePictureUrl,
+                profilePictureUrl = state.user?.profilePictureUrl,
                 onProfilePicClick = {
                     isProfileBottomSheetOpen = true
                 }
@@ -223,7 +242,10 @@ private fun DashboardScreenPreview(){
             onFabClicked = {},
             onItemCardClicked = {},
             paddingValues = PaddingValues(0.dp, 0.dp, 0.dp, 0.dp),
-            snackbarHostState = SnackbarHostState()
+            snackbarHostState = SnackbarHostState(),
+            uiEvent = flowOf(),
+            state = DashboardState(),
+            onEvent = {}
         )
     }
 }

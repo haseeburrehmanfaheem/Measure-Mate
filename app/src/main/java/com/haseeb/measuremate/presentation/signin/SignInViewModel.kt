@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.haseeb.measuremate.domain.model.AuthStatus
 import com.haseeb.measuremate.domain.repository.AuthRepository
+import com.haseeb.measuremate.domain.repository.DatabaseRepository
 import com.haseeb.measuremate.presentation.util.UiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -20,7 +21,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SignInViewModel @Inject constructor(
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val databaseRepository: DatabaseRepository
 ) : ViewModel() {
 
 
@@ -75,8 +77,18 @@ class SignInViewModel @Inject constructor(
             _state.update {
                 it.copy(isGoogleSignInButtonLoading = true)
             }
-            authRepository.SignIn(context).onSuccess {
-                _uiEvent.send(UiEvent.ShowSnackbar("Signed in with Google"))
+            authRepository.SignIn(context).onSuccess { isNewUser->
+                if(isNewUser){
+                    databaseRepository.addUser()
+                        .onSuccess {
+                            _uiEvent.send(UiEvent.ShowSnackbar("Signed in with Google"))
+                        }
+                        .onFailure {
+                            _uiEvent.send(UiEvent.ShowSnackbar("Failed to sign in with Google ${it.message}"))
+                        }
+                }else {
+                    _uiEvent.send(UiEvent.ShowSnackbar("Signed in with Google"))
+                }
             }.onFailure {
                 _uiEvent.send(UiEvent.ShowSnackbar("Failed to sign in with Google ${it.message}"))
             }

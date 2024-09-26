@@ -100,6 +100,7 @@ dependencies {
 
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)
+    implementation(libs.firebase.store)
 
 
 
@@ -109,4 +110,7 @@ dependencies {
     // Android 13 and below.
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.googleid)
+
+
+
 }

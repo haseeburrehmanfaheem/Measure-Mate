@@ -5,6 +5,7 @@ import androidx.credentials.CredentialManager
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.haseeb.measuremate.data.repository.AuthRepositoryImpl
 import com.haseeb.measuremate.data.repository.DatabaseRepositoryImpl
 import com.haseeb.measuremate.domain.repository.AuthRepository
@@ -33,11 +34,19 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun provideFirebaseFirestore() : FirebaseFirestore{
+        return FirebaseFirestore.getInstance()
+    }
+
+
+    @Provides
+    @Singleton
     fun provideDatabaseRepository(
-        firebaseAuth: FirebaseAuth
+        firebaseAuth: FirebaseAuth,
+        firebasefirestore: FirebaseFirestore
     ) : DatabaseRepository{
         return DatabaseRepositoryImpl(
-            firebaseAuth
+            firebaseAuth,firebasefirestore
         )
     }
 

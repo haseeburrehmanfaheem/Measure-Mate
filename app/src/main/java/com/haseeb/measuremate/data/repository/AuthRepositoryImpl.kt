@@ -44,6 +44,16 @@ class AuthRepositoryImpl(
         }
     }
 
+    override suspend fun SignOut(): Result<Boolean> {
+        return try {
+            firebaseAuth.signOut()
+            Result.success(value = true)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+
 
     private suspend fun getGoogleAuthCredentials(context: Context): Result<AuthCredential?> {
         return try {

@@ -11,7 +11,10 @@ import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSiz
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -40,18 +43,23 @@ class MainActivity : ComponentActivity() {
 //                DetailsScreen(windowSizeClass = windowSizeClass.widthSizeClass)
                 val signInViewModel : SignInViewModel = hiltViewModel()
                 val authStatus by signInViewModel.authStatus.collectAsStateWithLifecycle()
+                var previousAuthStatus by rememberSaveable {
+                    mutableStateOf<AuthStatus?>(null)
+                }
                 LaunchedEffect(key1 = authStatus) {
-                    when(authStatus){
-                        AuthStatus.AUTHORIZED -> {
-                            navController.navigate(Routes.DashboardScreen)
-                        }
-                        AuthStatus.UNAUTHORIZED -> {
-                            navController.navigate(Routes.SignInScreen)
-                        }
+                    if(previousAuthStatus != authStatus){
+                        when(authStatus){
+                            AuthStatus.AUTHORIZED -> {
+                                navController.navigate(Routes.DashboardScreen){popUpTo(0)}
+                            }
+                            AuthStatus.UNAUTHORIZED -> {
+                                navController.navigate(Routes.SignInScreen){popUpTo(0)}
+                            }
 
-                        AuthStatus.LOADING -> {}
+                            AuthStatus.LOADING -> {}
+                        }
                     }
-
+                    previousAuthStatus = authStatus
                 }
                 val snackbarHostState = remember {
                     SnackbarHostState()
