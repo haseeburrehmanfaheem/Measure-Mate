@@ -3,22 +3,27 @@ package com.haseeb.measuremate.data.repository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.snapshots
 import com.haseeb.measuremate.data.mapper.BodyPartDto
+import com.haseeb.measuremate.data.mapper.BodyPartValueDto
 import com.haseeb.measuremate.data.mapper.UserDto
 import com.haseeb.measuremate.data.mapper.toBodyPart
 import com.haseeb.measuremate.data.mapper.toBodyPartDto
+import com.haseeb.measuremate.data.mapper.toBodyPartValue
 import com.haseeb.measuremate.data.mapper.toBodyPartValueDto
 import com.haseeb.measuremate.data.mapper.toUser
 import com.haseeb.measuremate.data.util.Constants.BODY_PART_COLLECTION
 import com.haseeb.measuremate.data.util.Constants.BODY_PART_NAME_FIELD
 import com.haseeb.measuremate.data.util.Constants.BODY_PART_VALUE_COLLECTION
+import com.haseeb.measuremate.data.util.Constants.BODY_PART_VALUE_DATE_FIELD
 import com.haseeb.measuremate.data.util.Constants.USER_COLLECTION
 import com.haseeb.measuremate.domain.model.BodyPart
 import com.haseeb.measuremate.domain.model.BodyPartValue
 import com.haseeb.measuremate.domain.model.User
 import com.haseeb.measuremate.domain.repository.DatabaseRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
 
@@ -127,40 +132,48 @@ class DatabaseRepositoryImpl(
             }
         }
     }
-//
-//    override fun getAllBodyPartsWithLatestValue(): Flow<List<BodyPart>> {
-//        TODO("Not yet implemented")
-//    }
-//
-//    override fun getAllBodyPartValues(bodyPartId: String): Flow<List<BodyPartValue>> {
-//        TODO("Not yet implemented")
-//    }
-//
-override suspend fun upsertBodyPart(bodyPart: BodyPart): Result<Boolean> {
-    return try {
-        val documentId = bodyPart.bodyPartId ?: bodyPartCollection().document().id
-        val bodyPartDto = bodyPart.toBodyPartDto().copy(bodyPartId = documentId)
-        bodyPartCollection()
-            .document(documentId)
-            .set(bodyPartDto)
-            .await()
-        Result.success(value = true)
-    } catch (e: Exception) {
-        Result.failure(e)
+
+    override fun getAllBodyPartValues(bodyPartId: String): Flow<List<BodyPartValue>> {
+        return flow {
+            try {
+                bodyPartValueCollection(bodyPartId)
+                    .orderBy(BODY_PART_VALUE_DATE_FIELD, Query.Direction.DESCENDING)
+                    .snapshots()
+                    .collect { snapshot ->
+                        val bodyPartValueDto = snapshot.toObjects(BodyPartValueDto::class.java)
+                        emit(bodyPartValueDto.map { it.toBodyPartValue() })
+                    }
+            } catch (e: Exception) {
+                throw e
+            }
+        }
     }
-}
-//
-override suspend fun deleteBodyPart(bodyPartId: String): Result<Boolean> {
-    return try {
-        bodyPartCollection()
-            .document(bodyPartId)
-            .delete()
-            .await()
-        Result.success(value = true)
-    } catch (e: Exception) {
-        Result.failure(e)
+
+    override suspend fun upsertBodyPart(bodyPart: BodyPart): Result<Boolean> {
+        return try {
+            val documentId = bodyPart.bodyPartId ?: bodyPartCollection().document().id
+            val bodyPartDto = bodyPart.toBodyPartDto().copy(bodyPartId = documentId)
+            bodyPartCollection()
+                .document(documentId)
+                .set(bodyPartDto)
+                .await()
+            Result.success(value = true)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
-}
+    //
+    override suspend fun deleteBodyPart(bodyPartId: String): Result<Boolean> {
+        return try {
+            bodyPartCollection()
+                .document(bodyPartId)
+                .delete()
+                .await()
+            Result.success(value = true)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 
     override suspend fun upsertBodyPartValue(bodyPartValue: BodyPartValue): Result<Boolean> {
         return try {

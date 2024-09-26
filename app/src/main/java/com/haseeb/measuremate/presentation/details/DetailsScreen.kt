@@ -108,7 +108,7 @@ fun DetailsScreen(
     }
 
 
-    var selectedTimeRange by rememberSaveable { mutableStateOf(TimeRange.LAST7DAYS) }
+
     var isDatePickerOpen by rememberSaveable { mutableStateOf(false) }
     val datePickerState = rememberDatePickerState(
         initialSelectedDateMillis = System.currentTimeMillis(),
@@ -185,8 +185,8 @@ fun DetailsScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(16.dp),
-                        selectedTimeRange = selectedTimeRange,
-                        onClick = { selectedTimeRange = it },
+                        selectedTimeRange = state.timeRange,
+                        onClick = { onEvent(DetailsEvent.OnTimeRangeChange(it)) },
                     )
 
                     LineGraph(
@@ -194,13 +194,13 @@ fun DetailsScreen(
                             .fillMaxWidth()
                             .aspectRatio(ratio = 2 / 1f)
                             .padding(16.dp),
-                        bodyPartValues = dummyBodyPartValues
+                        bodyPartValues = state.graphBodyPartValues
                     )
 
                     Box(
                         modifier = Modifier.fillMaxSize(),
                     ) {
-                        HistorySection(bodyPartValues = dummyBodyPartValues, measuringUnitCode = MeasuringUnit.CM.code) {}
+                        HistorySection(bodyPartValues = state.allBodyPartValues, measuringUnitCode = state.bodyPart?.measuringUnit) {}
                     }
                 }
                 NewValueInputBar(
@@ -248,8 +248,8 @@ fun DetailsScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(16.dp),
-                            selectedTimeRange = selectedTimeRange,
-                            onClick = { selectedTimeRange = it },
+                            selectedTimeRange = state.timeRange,
+                            onClick = { onEvent(DetailsEvent.OnTimeRangeChange(it)) },
                         )
 
                         LineGraph(
@@ -257,14 +257,14 @@ fun DetailsScreen(
                                 .fillMaxWidth()
                                 .aspectRatio(ratio = 2 / 1f)
                                 .padding(16.dp),
-                            bodyPartValues = dummyBodyPartValues
+                            bodyPartValues = state.graphBodyPartValues
                         )
 
                     }
                     Box(
                         modifier = Modifier.fillMaxSize().weight(1f)
                     ){
-                        HistorySection(bodyPartValues = dummyBodyPartValues, measuringUnitCode = MeasuringUnit.CM.code) {}
+                        HistorySection(bodyPartValues = state.allBodyPartValues, measuringUnitCode = MeasuringUnit.CM.code) {}
 
 
                 NewValueInputBar(
@@ -292,34 +292,8 @@ fun DetailsScreen(
             }
         }
     }
-
-
-
-
-
-
 }
 
-
-
-
-
-
-
-
-val dummyBodyPartValues = listOf(
-    BodyPartValue(value = 72.0f, date = LocalDate.of(2023, 5, 10)),
-    BodyPartValue(value = 76.84865145f, date = LocalDate.of(2023, 5, 1)),
-    BodyPartValue(value = 74.0f, date = LocalDate.of(2023, 4, 20)),
-    BodyPartValue(value = 75.1f, date = LocalDate.of(2023, 4, 5)),
-    BodyPartValue(value = 66.3f, date = LocalDate.of(2023, 3, 15)),
-    BodyPartValue(value = 67.2f, date = LocalDate.of(2023, 3, 10)),
-    BodyPartValue(value = 73.5f, date = LocalDate.of(2023, 3, 1)),
-    BodyPartValue(value = 69.8f, date = LocalDate.of(2023, 2, 18)),
-    BodyPartValue(value = 68.4f, date = LocalDate.of(2023, 2, 1)),
-    BodyPartValue(value = 72.0f, date = LocalDate.of(2023, 1, 22)),
-    BodyPartValue(value = 70.5f, date = LocalDate.of(2023, 1, 14))
-)
 @Composable
 private fun ChartTimeRangeButtons(
     modifier: Modifier = Modifier,

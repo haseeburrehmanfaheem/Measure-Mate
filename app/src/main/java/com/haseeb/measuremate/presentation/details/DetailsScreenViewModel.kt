@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.haseeb.measuremate.domain.model.BodyPart
 import com.haseeb.measuremate.domain.model.BodyPartValue
+import com.haseeb.measuremate.domain.model.TimeRange
 import com.haseeb.measuremate.domain.repository.DatabaseRepository
 import com.haseeb.measuremate.presentation.navigation.Routes
 import com.haseeb.measuremate.presentation.util.UiEvent
@@ -39,17 +40,23 @@ class DetailsScreenViewModel @Inject constructor(
     val state = combine(
         _state,
         databaseRepository.getBodyPart(bodyPartId),
-//        databaseRepository.getAllBodyPartValues(bodyPartId)
-    ) { state, bodyPart ->
+        databaseRepository.getAllBodyPartValues(bodyPartId)
+    ) { state, bodyPart, bodyPartValues ->
         val currentDate = LocalDate.now()
-//        val last7DaysValues = bodyPartValues.filter { bodyPartValue ->
-//            bodyPartValue.date.isAfter(currentDate.minusDays(7))
-//        }
-//        val last30DaysValues = bodyPartValues.filter { bodyPartValue ->
-//            bodyPartValue.date.isAfter(currentDate.minusDays(30))
-//        }
+        val last7DaysValues = bodyPartValues.filter { bodyPartValue ->
+            bodyPartValue.date.isAfter(currentDate.minusDays(7))
+        }
+        val last30DaysValues = bodyPartValues.filter { bodyPartValue ->
+            bodyPartValue.date.isAfter(currentDate.minusDays(30))
+        }
         state.copy(
             bodyPart = bodyPart,
+            allBodyPartValues = bodyPartValues,
+            graphBodyPartValues = when (state.timeRange) {
+                TimeRange.LAST7DAYS -> last7DaysValues
+                TimeRange.LAST30DAYS -> last30DaysValues
+                TimeRange.AllTime -> bodyPartValues
+            }
         )
     }.catch { e ->
         _uiEvent.send(UiEvent.ShowSnackbar(message = "Something went wrong. ${e.message}"))
@@ -58,7 +65,6 @@ class DetailsScreenViewModel @Inject constructor(
         started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5000),
         initialValue = DetailsState()
     )
-
 
     fun onEvent(event: DetailsEvent) {
         when (event) {
@@ -92,7 +98,9 @@ class DetailsScreenViewModel @Inject constructor(
             is DetailsEvent.OnTextFieldValueChange -> {
                 _state.update { it.copy(textFieldValue = event.value) }
             }
-            is DetailsEvent.OnTimeRangeChange -> TODO()
+            is DetailsEvent.OnTimeRangeChange -> {
+                _state.update { it.copy(timeRange = event.timeRange) }
+            }
             DetailsEvent.RestoreBodyPartValue -> TODO()
         }
     }
