@@ -61,7 +61,9 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.LaunchedEffect
@@ -96,7 +98,14 @@ fun DetailsScreen(
         uiEvent.collect {
                 event -> when(event){
             is UiEvent.ShowSnackbar -> {
-                snackbarHostState.showSnackbar(event.message)
+                val result = snackbarHostState.showSnackbar(
+                    event.message,
+                    actionLabel = event.actionLabel,
+                    duration = SnackbarDuration.Short
+                    )
+                if (result == SnackbarResult.ActionPerformed) {
+                    onEvent(DetailsEvent.RestoreBodyPartValue)
+                }
             }
 
             UiEvent.HideBottomSheet -> {}
@@ -200,7 +209,9 @@ fun DetailsScreen(
                     Box(
                         modifier = Modifier.fillMaxSize(),
                     ) {
-                        HistorySection(bodyPartValues = state.allBodyPartValues, measuringUnitCode = state.bodyPart?.measuringUnit) {}
+                        HistorySection(bodyPartValues = state.allBodyPartValues, measuringUnitCode = state.bodyPart?.measuringUnit) {
+                            onEvent(DetailsEvent.DeleteBodyPartValue(it))
+                        }
                     }
                 }
                 NewValueInputBar(
@@ -264,7 +275,9 @@ fun DetailsScreen(
                     Box(
                         modifier = Modifier.fillMaxSize().weight(1f)
                     ){
-                        HistorySection(bodyPartValues = state.allBodyPartValues, measuringUnitCode = MeasuringUnit.CM.code) {}
+                        HistorySection(bodyPartValues = state.allBodyPartValues, measuringUnitCode = MeasuringUnit.CM.code) {
+                            onEvent(DetailsEvent.DeleteBodyPartValue(it))
+                        }
 
 
                 NewValueInputBar(

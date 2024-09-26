@@ -22,6 +22,8 @@ import com.haseeb.measuremate.domain.model.BodyPart
 import com.haseeb.measuremate.domain.model.BodyPartValue
 import com.haseeb.measuremate.domain.model.User
 import com.haseeb.measuremate.domain.repository.DatabaseRepository
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
@@ -191,9 +193,53 @@ class DatabaseRepositoryImpl(
         }
     }
 
-//
-//    override suspend fun deleteBodyPartValue(bodyPartValue: BodyPartValue): Result<Boolean> {
-//        TODO("Not yet implemented")
-//    }
+    override suspend fun deleteBodyPartValue(bodyPartValue: BodyPartValue): Result<Boolean> {
+        return try {
+            val bodyPartId = bodyPartValue.bodyPartId.orEmpty()
+            val bodyPartValueId = bodyPartValue.bodyPartValueId.orEmpty()
+            bodyPartValueCollection(bodyPartId)
+                .document(bodyPartValueId)
+                .delete()
+                .await()
+            Result.success(value = true)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override fun getAllBodyPartsWithLatestValue(): Flow<List<BodyPart>> {
+        return flow {
+            try {
+                bodyPartCollection()
+                    .orderBy(BODY_PART_NAME_FIELD)
+                    .snapshots()
+                    .collect { snapshot ->
+                        val bodyPartDtos = snapshot.toObjects(BodyPartDto::class.java)
+                        val bodyParts = coroutineScope {
+                            bodyPartDtos.mapNotNull { bodyPartDto ->
+                                bodyPartDto.bodyPartId?.let { bodyPartId ->
+                                    async {
+                                        val latestValue = getLatestBodyPartValue(bodyPartId)
+                                        bodyPartDto.copy(latestValue = latestValue?.value).toBodyPart()
+                                    }
+                                }
+                            }.map { it.await() }
+                        }
+                        emit(bodyParts)
+                    }
+            } catch (e: Exception) {
+                throw e
+            }
+        }
+    }
+
+    private suspend fun getLatestBodyPartValue(bodyPartId: String): BodyPartValueDto? {
+        val querySnapshot = bodyPartValueCollection(bodyPartId)
+            .orderBy(BODY_PART_VALUE_DATE_FIELD, Query.Direction.DESCENDING)
+            .limit(1)
+            .get()
+            .await()
+        return querySnapshot.documents.firstOrNull()?.toObject(BodyPartValueDto::class.java)
+    }
 
 }

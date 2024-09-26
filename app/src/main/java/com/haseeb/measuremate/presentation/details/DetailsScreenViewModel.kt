@@ -90,7 +90,10 @@ class DetailsScreenViewModel @Inject constructor(
             DetailsEvent.DeleteBodyPart -> {
                 deleteBodyPart()
             }
-            is DetailsEvent.DeleteBodyPartValue -> TODO()
+            is DetailsEvent.DeleteBodyPartValue -> {
+                deleteBodyPartValue(event.bodyPartValue)
+                _state.update { it.copy(recentlyDeletedBodyPartValue = event.bodyPartValue) }
+            }
             is DetailsEvent.OnDateChange -> {
                 val date = event.millis.changeMillisToLocalDate()
                 _state.update { it.copy(date = date) }
@@ -101,7 +104,10 @@ class DetailsScreenViewModel @Inject constructor(
             is DetailsEvent.OnTimeRangeChange -> {
                 _state.update { it.copy(timeRange = event.timeRange) }
             }
-            DetailsEvent.RestoreBodyPartValue -> TODO()
+            DetailsEvent.RestoreBodyPartValue -> {
+                upsertBodyPartValue(state.value.recentlyDeletedBodyPartValue)
+                _state.update { it.copy(recentlyDeletedBodyPartValue = null) }
+            }
         }
     }
 
@@ -140,6 +146,23 @@ class DetailsScreenViewModel @Inject constructor(
                 }
                 .onFailure { e ->
                     _uiEvent.send(UiEvent.ShowSnackbar(message = "Couldn't saved. ${e.message}"))
+                }
+        }
+    }
+
+    private fun deleteBodyPartValue(bodyPartValue: BodyPartValue) {
+        viewModelScope.launch {
+            databaseRepository.deleteBodyPartValue(bodyPartValue)
+                .onSuccess {
+                    _uiEvent.send(
+                        UiEvent.ShowSnackbar(
+                            message = "Body Part Value deleted successfully",
+                            actionLabel = "Undo"
+                        )
+                    )
+                }
+                .onFailure { e ->
+                    _uiEvent.send(UiEvent.ShowSnackbar(message = "Couldn't delete. ${e.message}"))
                 }
         }
     }
