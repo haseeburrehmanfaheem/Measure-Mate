@@ -20,6 +20,8 @@ import com.haseeb.measuremate.presentation.dashboard.DashboardScreen
 import com.haseeb.measuremate.presentation.dashboard.DashboardState
 import com.haseeb.measuremate.presentation.dashboard.DashboardViewModel
 import com.haseeb.measuremate.presentation.details.DetailsScreen
+import com.haseeb.measuremate.presentation.details.DetailsScreenViewModel
+import com.haseeb.measuremate.presentation.details.DetailsState
 import com.haseeb.measuremate.presentation.signin.SignInScreen
 import com.haseeb.measuremate.presentation.signin.SignInViewModel
 import com.haseeb.measuremate.presentation.util.UiEvent
@@ -42,6 +44,7 @@ fun NavGraphSetup(
             }
 
             UiEvent.HideBottomSheet -> {}
+            UiEvent.Navigate -> {}
         }
         }
 
@@ -116,14 +119,17 @@ fun NavGraphSetup(
                 animationSpec = tween(durationMillis = 500),
                 towards = AnimatedContentTransitionScope.SlideDirection.End
             )}
-        ) { navBackStackEntry ->
-            val bodyPartId = navBackStackEntry.toRoute<Routes.DetailsScreen>().bodyPartId
+        ) {
+            val detailsViewModel : DetailsScreenViewModel = hiltViewModel()
+            val state by detailsViewModel.state.collectAsStateWithLifecycle()
             DetailsScreen(
-                bodyPartId = bodyPartId,
                 windowSizeClass = windowSize,
                 onBackButtonClick = {navController.navigateUp()},
                 paddingValues = paddingValues,
-                snackbarHostState = snackbarHostState
+                snackbarHostState = snackbarHostState,
+                state = state,
+                onEvent = detailsViewModel::onEvent,
+                uiEvent = detailsViewModel.uiEvent
             )
         }
 

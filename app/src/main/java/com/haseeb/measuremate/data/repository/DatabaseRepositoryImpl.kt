@@ -8,9 +8,11 @@ import com.haseeb.measuremate.data.mapper.BodyPartDto
 import com.haseeb.measuremate.data.mapper.UserDto
 import com.haseeb.measuremate.data.mapper.toBodyPart
 import com.haseeb.measuremate.data.mapper.toBodyPartDto
+import com.haseeb.measuremate.data.mapper.toBodyPartValueDto
 import com.haseeb.measuremate.data.mapper.toUser
 import com.haseeb.measuremate.data.util.Constants.BODY_PART_COLLECTION
 import com.haseeb.measuremate.data.util.Constants.BODY_PART_NAME_FIELD
+import com.haseeb.measuremate.data.util.Constants.BODY_PART_VALUE_COLLECTION
 import com.haseeb.measuremate.data.util.Constants.USER_COLLECTION
 import com.haseeb.measuremate.domain.model.BodyPart
 import com.haseeb.measuremate.domain.model.BodyPartValue
@@ -37,6 +39,18 @@ class DatabaseRepositoryImpl(
             .collection(USER_COLLECTION)
             .document(userId)
             .collection(BODY_PART_COLLECTION)
+    }
+
+    private fun bodyPartValueCollection(
+        bodyPartId: String,
+        userId: String = firebaseAuth.currentUser?.uid.orEmpty()
+    ): CollectionReference {
+        return firebaseFirestore
+            .collection(USER_COLLECTION)
+            .document(userId)
+            .collection(BODY_PART_COLLECTION)
+            .document(bodyPartId)
+            .collection(BODY_PART_VALUE_COLLECTION)
     }
 
 
@@ -82,10 +96,22 @@ class DatabaseRepositoryImpl(
         }
     }
 
-//    override fun getBodyPart(bodyPartId: String): Flow<BodyPart?> {
-//        TODO("Not yet implemented")
-//    }
-//
+    override fun getBodyPart(bodyPartId: String): Flow<BodyPart?> {
+        return flow {
+            try {
+                bodyPartCollection()
+                    .document(bodyPartId)
+                    .snapshots()
+                    .collect { snapshot ->
+                        val bodyPartDto = snapshot.toObject(BodyPartDto::class.java)
+                        emit(bodyPartDto?.toBodyPart())
+                    }
+            } catch (e: Exception) {
+                throw e
+            }
+        }
+    }
+
     override fun getAllBodyParts(): Flow<List<BodyPart>> {
         return flow {
             try {
@@ -124,13 +150,34 @@ override suspend fun upsertBodyPart(bodyPart: BodyPart): Result<Boolean> {
     }
 }
 //
-//    override suspend fun deleteBodyPart(bodyPartId: String): Result<Boolean> {
-//        TODO("Not yet implemented")
-//    }
-//
-//    override suspend fun upsertBodyPartValue(bodyPartValue: BodyPartValue): Result<Boolean> {
-//        TODO("Not yet implemented")
-//    }
+override suspend fun deleteBodyPart(bodyPartId: String): Result<Boolean> {
+    return try {
+        bodyPartCollection()
+            .document(bodyPartId)
+            .delete()
+            .await()
+        Result.success(value = true)
+    } catch (e: Exception) {
+        Result.failure(e)
+    }
+}
+
+    override suspend fun upsertBodyPartValue(bodyPartValue: BodyPartValue): Result<Boolean> {
+        return try {
+            val bodyPartValueCollection = bodyPartValueCollection(bodyPartValue.bodyPartId.orEmpty())
+            val documentId = bodyPartValue.bodyPartValueId ?: bodyPartValueCollection.document().id
+            val bodyPartValueDto = bodyPartValue.toBodyPartValueDto().copy(bodyPartValueId = documentId)
+
+            bodyPartValueCollection
+                .document(documentId)
+                .set(bodyPartValueDto)
+                .await()
+            Result.success(value = true)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
 //
 //    override suspend fun deleteBodyPartValue(bodyPartValue: BodyPartValue): Result<Boolean> {
 //        TODO("Not yet implemented")

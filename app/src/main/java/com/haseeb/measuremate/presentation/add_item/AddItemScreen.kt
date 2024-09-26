@@ -61,6 +61,7 @@ fun AddItemScreen(
             }
 
             UiEvent.HideBottomSheet -> {}
+            UiEvent.Navigate -> {}
         }
         }
     }

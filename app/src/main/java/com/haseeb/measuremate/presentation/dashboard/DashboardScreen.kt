@@ -94,6 +94,8 @@ fun DashboardScreen(
 
 
             }
+
+            UiEvent.Navigate -> {}
         }
         }
     }
