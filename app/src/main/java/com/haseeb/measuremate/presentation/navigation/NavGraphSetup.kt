@@ -15,6 +15,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import com.haseeb.measuremate.presentation.add_item.AddItemScreen
+import com.haseeb.measuremate.presentation.add_item.AddItemViewModel
 import com.haseeb.measuremate.presentation.dashboard.DashboardScreen
 import com.haseeb.measuremate.presentation.dashboard.DashboardState
 import com.haseeb.measuremate.presentation.dashboard.DashboardViewModel
@@ -93,10 +94,15 @@ fun NavGraphSetup(
                 towards = AnimatedContentTransitionScope.SlideDirection.End
             )}
         ) {
+            val viewModel = hiltViewModel<AddItemViewModel>()
+            val state by viewModel.state.collectAsStateWithLifecycle()
             AddItemScreen(
                 onBackButtonClick = {navController.navigateUp()},
                 paddingValues = paddingValues,
-                snackbarHostState = snackbarHostState
+                snackbarHostState = snackbarHostState,
+                state = state,
+                uiEvent = viewModel.uiEvent,
+                onEvent = viewModel::onEvent
             )
         }
         composable<Routes.DetailsScreen>(

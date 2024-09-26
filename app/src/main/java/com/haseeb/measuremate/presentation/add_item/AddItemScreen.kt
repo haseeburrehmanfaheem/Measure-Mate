@@ -26,6 +26,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -36,14 +37,33 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.haseeb.measuremate.domain.model.predefinedBodyParts
 import com.haseeb.measuremate.presentation.component.Dialog
+import com.haseeb.measuremate.presentation.util.UiEvent
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.launch
 
 
 @Composable
 fun AddItemScreen(
     onBackButtonClick: () -> Unit,
     paddingValues: PaddingValues,
-    snackbarHostState: SnackbarHostState
+    snackbarHostState: SnackbarHostState,
+    state: AddItemState,
+    uiEvent: Flow<UiEvent>,
+    onEvent : (AddItemEvent) -> Unit
 ) {
+
+    LaunchedEffect(key1 = Unit) {
+        uiEvent.collect {
+                event -> when(event){
+            is UiEvent.ShowSnackbar -> {
+                snackbarHostState.showSnackbar(event.message)
+            }
+
+            UiEvent.HideBottomSheet -> {}
+        }
+        }
+    }
     var isAddNewItemDialogOpen by rememberSaveable { mutableStateOf(false) }
 
     Dialog(
@@ -52,16 +72,19 @@ fun AddItemScreen(
         },
         onConfirm = {
             isAddNewItemDialogOpen = false
+            onEvent(AddItemEvent.UpsertItem)
         },
-        title = "Add New Item",
+        title = "Add/Update New Item",
         confirmButtonText = "Save",
         body = {
-            OutlinedTextField(value = "", onValueChange ={} )
+            OutlinedTextField(value = state.textFieldValue, onValueChange = { onEvent(AddItemEvent.OnTextFieldValueChange(it))  } )
         },
         isOpen = isAddNewItemDialogOpen
     )
     Column(
-        modifier = Modifier.fillMaxSize().padding(paddingValues)
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(paddingValues)
     ) {
         AddItemTopBar(
             onAddIconClick = { isAddNewItemDialogOpen = true },
@@ -74,12 +97,15 @@ fun AddItemScreen(
             verticalArrangement = Arrangement.spacedBy(12.dp),
             horizontalArrangement = Arrangement.spacedBy(32.dp)
         ) {
-            items(predefinedBodyParts){
+            items(state.bodyParts){
                 ItemCart(
                     name = it.name,
-                    onClick = {},
+                    onClick = {
+                        isAddNewItemDialogOpen = true
+                        onEvent(AddItemEvent.OnItemClick(it))
+                    },
                     checked = it.isActive,
-                    onCheckedChange = { }
+                    onCheckedChange = { onEvent(AddItemEvent.OnItemIsActiveChange(it)) }
                 )
             }
         }
@@ -145,6 +171,6 @@ private fun ItemCart(
 @Preview
 @Composable
 private fun AddItemScreenPreview() {
-    AddItemScreen({}, PaddingValues(0.dp), SnackbarHostState())
+    AddItemScreen({}, PaddingValues(0.dp), SnackbarHostState(), AddItemState(), flowOf(), {})
 
 }

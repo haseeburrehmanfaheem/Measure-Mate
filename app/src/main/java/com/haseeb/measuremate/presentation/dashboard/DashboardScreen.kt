@@ -96,7 +96,6 @@ fun DashboardScreen(
             }
         }
         }
-
     }
     var isSignOutDialogOpen by rememberSaveable { mutableStateOf(false) }
 
@@ -154,7 +153,7 @@ fun DashboardScreen(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 horizontalArrangement = Arrangement.spacedBy(32.dp)
             ) {
-                items(predefinedBodyParts){
+                items(state.bodyParts){
                     ItemCart(
                         bodyPart = it,
                         onItemCardClicked = { bodyPartId ->

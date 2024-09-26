@@ -33,11 +33,12 @@ class DashboardViewModel @Inject constructor(
         _state,
         databaseRepository.getSignedInUser(),
 //        databaseRepository.getAllBodyPartsWithLatestValue()
-    ) { state, user ->
-//        val activeBodyParts = bodyParts.filter { it.isActive }
+        databaseRepository.getAllBodyParts()
+    ) { state, user, bodyParts ->
+        val activeBodyParts = bodyParts.filter { it.isActive }
         state.copy(
             user = user,
-//            bodyParts = activeBodyParts
+            bodyParts = activeBodyParts
         )
     }.catch { e ->
         _uiEvent.send(UiEvent.ShowSnackbar(message = "Something went wrong. ${e.message}"))

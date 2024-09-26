@@ -4,10 +4,13 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.snapshots
+import com.haseeb.measuremate.data.mapper.BodyPartDto
 import com.haseeb.measuremate.data.mapper.UserDto
+import com.haseeb.measuremate.data.mapper.toBodyPart
 import com.haseeb.measuremate.data.mapper.toBodyPartDto
 import com.haseeb.measuremate.data.mapper.toUser
 import com.haseeb.measuremate.data.util.Constants.BODY_PART_COLLECTION
+import com.haseeb.measuremate.data.util.Constants.BODY_PART_NAME_FIELD
 import com.haseeb.measuremate.data.util.Constants.USER_COLLECTION
 import com.haseeb.measuremate.domain.model.BodyPart
 import com.haseeb.measuremate.domain.model.BodyPartValue
@@ -83,9 +86,21 @@ class DatabaseRepositoryImpl(
 //        TODO("Not yet implemented")
 //    }
 //
-//    override fun getAllBodyParts(): Flow<List<BodyPart>> {
-//        TODO("Not yet implemented")
-//    }
+    override fun getAllBodyParts(): Flow<List<BodyPart>> {
+        return flow {
+            try {
+                bodyPartCollection()
+                    .orderBy(BODY_PART_NAME_FIELD)
+                    .snapshots()
+                    .collect { snapshot ->
+                        val bodyPartDtos = snapshot.toObjects(BodyPartDto::class.java)
+                        emit(bodyPartDtos.map { it.toBodyPart() })
+                    }
+            } catch (e: Exception) {
+                throw e
+            }
+        }
+    }
 //
 //    override fun getAllBodyPartsWithLatestValue(): Flow<List<BodyPart>> {
 //        TODO("Not yet implemented")

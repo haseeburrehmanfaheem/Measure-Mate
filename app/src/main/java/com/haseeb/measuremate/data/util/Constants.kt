@@ -9,4 +9,13 @@ object Constants {
     //Firestore collection references
     const val USER_COLLECTION = "users"
 
+
+    const val BODY_PART_VALUE_COLLECTION = "bodyPartValues"
+
+    //firestore bodyPart field reference
+    const val BODY_PART_NAME_FIELD = "name"
+
+    //firestore bodyPartValue field reference
+    const val BODY_PART_VALUE_DATE_FIELD = "date"
+
 }
