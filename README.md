@@ -1,6 +1,6 @@
 # MeasureMate
 
-MeasureMate is an Android application designed to help users easily track and manage measurements for various items. The app features Firebase Authentication for secure sign-ins and Firebase Firestore for real-time data management. Built using modern Android development tools and libraries such as Jetpack Compose, Dagger Hilt, and Material 3, MeasureMate delivers a seamless user experience with a clean, modular codebase.
+MeasureMate is an Android application designed to help users easily track and manage measurements for track and manage gym progress. The app features Firebase Authentication for secure sign-ins and Firebase Firestore for real-time data management. Built using modern Android development tools and libraries such as Jetpack Compose, Dagger Hilt, and Material 3, MeasureMate delivers a seamless user experience with a clean, modular codebase.
 
 ## Key Features
 
